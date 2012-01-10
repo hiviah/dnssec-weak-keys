@@ -1,0 +1,10 @@
+0. Get list of domains, one per line into "domains" file
+
+1. Scan domains' keys
+python fetch_dnskey.py domains keys 20
+
+2. Extract keys from logfile
+./parse_keys.pl < fetch_dnskey.log > domain_dnskeys
+
+3. List weak keys
+./list_weak_keys.py < domain_dnskeys > weak_keys
