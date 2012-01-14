@@ -1,5 +1,8 @@
 0. Get list of domains, one per line into "domains" file
 
+0.2 Build unbound with python module (not all Linux distributions have it enabled) using configure like:
+./configure --with-pyunbound --with-pythonmodule --disable-gost --with-pthreads
+
 0.5 Make "keys" file with trust anchors for libunbound validation, e.g.
 .   IN DS   19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5
 
