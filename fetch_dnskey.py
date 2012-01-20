@@ -34,6 +34,21 @@ class RSAKey:
 		self.digest_algo = digest_algo
 		self.key_purpose = key_purpose
 
+
+class DnskeyAlgo:
+	
+	algo_map = \
+		{ 
+		     1: "RSA/MD5",
+		     5: "RSA/SHA-1",
+		     7: "RSASHA1-NSEC3-SHA1",
+		     8: "RSA/SHA-256",
+		    10: "RSA/SHA-512",
+		}
+	
+	algo_ids = algo_map.keys()
+
+
 class DnskeyScanThread(threading.Thread):
 
 	def __init__(self, task_queue, ta_file): 
@@ -55,7 +70,7 @@ class DnskeyScanThread(threading.Thread):
 				algo = ord(key[3])
 				pubkey = key[4:]
 				
-				if algo not in [1, 5] or proto != 3: #RSA/MD5 and RSA/SHA1, must be DNSSEC protocol
+				if algo not in DnskeyAlgo.algo_ids or proto != 3: #only RSA/x algorithms, must be DNSSEC protocol
 					continue
 
 				#stupid RFC 2537/3110 exponent length encoding
@@ -69,10 +84,7 @@ class DnskeyScanThread(threading.Thread):
 
 				exponent = pubkey[exp_hdr_len:exp_hdr_len + exp_len]
 				modulus  = pubkey[exp_hdr_len + exp_len:]
-				if algo == 1:
-					digest_algo = "RSA-MD5"
-				else:
-					digest_algo = "RSA-SHA1"
+				digest_algo = DnskeyAlgo.algo_map[algo]
 
 				if flags == 257:
 				    	key_purpose = "KSK"
