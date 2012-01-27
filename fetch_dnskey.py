@@ -71,6 +71,7 @@ class DnskeyScanThread(threading.Thread):
 				pubkey = key[4:]
 				
 				if algo not in DnskeyAlgo.algo_ids or proto != 3: #only RSA/x algorithms, must be DNSSEC protocol
+					logging.debug("Skipped key for domain %s - algorithm %s, proto %s, pubkey: %s", domain, algo, proto, hexlify(pubkey))
 					continue
 
 				#stupid RFC 2537/3110 exponent length encoding
@@ -87,13 +88,15 @@ class DnskeyScanThread(threading.Thread):
 				digest_algo = DnskeyAlgo.algo_map[algo]
 
 				if flags == 257:
-				    	key_purpose = "KSK"
+					key_purpose = "KSK"
 				elif flags == 256:
 					key_purpose = "ZSK"
 				else:
-				    	key_purpose = "?SK_%04x" % flags #for revoked bit and other reserved bits
+					key_purpose = "?SK_%04x" % flags #for revoked bit and other reserved bits
 
 				keys.append(RSAKey(exponent, modulus, digest_algo, key_purpose))
+		else:
+			logging.debug("No key for %s - status: %s, havedata: %s", domain, status, result.havedata)
 
 		return keys
 
