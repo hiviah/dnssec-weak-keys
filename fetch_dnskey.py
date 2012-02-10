@@ -24,7 +24,7 @@ import logging
 import struct
 
 from binascii import hexlify
-from unbound import ub_ctx, RR_CLASS_IN, RR_TYPE_DNSKEY
+from unbound import ub_ctx, ub_version, RR_CLASS_IN, RR_TYPE_DNSKEY
 
 class RSAKey:
 
@@ -57,6 +57,7 @@ class DnskeyScanThread(threading.Thread):
 		
 		self.resolver = ub_ctx()
 		#self.resolver.resolvconf("/etc/resolv.conf")
+                self.resolver.set_fwd("127.0.0.1")
 		self.resolver.add_ta_file(ta_file) #read public keys for DNSSEC verification
 
 	def get_rsa_keys(self, domain):
@@ -96,7 +97,7 @@ class DnskeyScanThread(threading.Thread):
 
 				keys.append(RSAKey(exponent, modulus, digest_algo, key_purpose))
 		else:
-			logging.debug("No key for %s - status: %s, havedata: %s", domain, status, result.havedata)
+			logging.debug("No key for %s - status: %s, rcode: %s, rcode_str: %s, havedata: %s", domain, status, result.rcode, result.rcode_str, result.havedata)
 
 		return keys
 
@@ -128,6 +129,8 @@ thread_count = int(sys.argv[3])
 
 logging.basicConfig(filename="fetch_dnskey.log", level=logging.DEBUG,
 	format="%(asctime)s %(levelname)s %(message)s [%(pathname)s:%(lineno)d]")
+
+logging.info("Unbound version: %s", ub_version())
 
 task_queue = Queue.Queue(5000)
 
