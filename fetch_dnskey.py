@@ -57,7 +57,7 @@ class DnskeyScanThread(threading.Thread):
 		
 		self.resolver = ub_ctx()
 		#self.resolver.resolvconf("/etc/resolv.conf")
-                self.resolver.set_fwd("127.0.0.1")
+		#self.resolver.set_fwd("127.0.0.1")
 		self.resolver.add_ta_file(ta_file) #read public keys for DNSSEC verification
 
 	def get_rsa_keys(self, domain):
